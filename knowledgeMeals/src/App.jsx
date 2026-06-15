@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import SearchBar from "./components/SearchBar";
@@ -9,13 +8,15 @@ import Statistics from "./components/Statistics";
 
 function App() {
   const [page, setPage] = useState("home");
+  const [notes, setNotes] = useState([]);
+  const [search, setSearch] = useState("");
 
-  const [notes, setNotes] = useState([
+  const sampleNotes = [
     {
       id: 1,
       subject: "수학",
       title: "삼각함수",
-      content: "sin, cos, tan 개념 정리",
+      content: "sin, cos, tan 공식 정리",
       tag: "수학",
     },
     {
@@ -23,7 +24,7 @@ function App() {
       subject: "영어",
       title: "관계대명사",
       content: "who, which, that 사용법",
-      tag: "영어",
+      tag: "문법",
     },
     {
       id: 3,
@@ -34,24 +35,65 @@ function App() {
     },
     {
       id: 4,
-      subject: "수학",
-      title: "미분",
-      content: "함수의 변화율 계산",
-      tag: "수학",
+      subject: "국어",
+      title: "현대소설",
+      content: "시점과 서술 방식 정리",
+      tag: "문학",
     },
-  ]);
+    {
+      id: 5,
+      subject: "프로그래밍",
+      title: "React useState",
+      content: "상태를 관리하는 Hook",
+      tag: "React",
+    },
+  ];
 
-  const [search, setSearch] = useState("");
+  // 처음 실행 시 LocalStorage 불러오기
+  useEffect(() => {
+    const savedNotes = localStorage.getItem(
+      "knowledgeMeals_notes"
+    );
+
+    if (
+      savedNotes &&
+      JSON.parse(savedNotes).length > 0
+    ) {
+      setNotes(JSON.parse(savedNotes));
+    } else {
+      setNotes(sampleNotes);
+    }
+  }, []);
+
+  // notes 변경 시 저장
+  useEffect(() => {
+    localStorage.setItem(
+      "knowledgeMeals_notes",
+      JSON.stringify(notes)
+    );
+  }, [notes]);
 
   const addNote = (newNote) => {
-    setNotes([...notes, newNote]);
+    setNotes((prev) => [...prev, newNote]);
+  };
+
+  const deleteNote = (id) => {
+    setNotes((prev) =>
+      prev.filter((note) => note.id !== id)
+    );
   };
 
   const filteredNotes = notes.filter(
     (note) =>
-      note.title.toLowerCase().includes(search.toLowerCase()) ||
-      note.subject.toLowerCase().includes(search.toLowerCase()) ||
-      note.tag.toLowerCase().includes(search.toLowerCase())
+      note.title
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      note.subject
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      note.tag
+        .toLowerCase()
+        .includes(search.toLowerCase())
   );
 
   return (
@@ -59,15 +101,21 @@ function App() {
       <Header />
 
       <div className="menu-buttons">
-        <button onClick={() => setPage("home")}>
+        <button
+          onClick={() => setPage("home")}
+        >
           🏠 홈
         </button>
 
-        <button onClick={() => setPage("write")}>
+        <button
+          onClick={() => setPage("write")}
+        >
           📝 지식 추가하기
         </button>
 
-        <button onClick={() => setPage("stats")}>
+        <button
+          onClick={() => setPage("stats")}
+        >
           📊 학습 분석
         </button>
       </div>
@@ -81,12 +129,18 @@ function App() {
             setSearch={setSearch}
           />
 
-          <NoteList notes={filteredNotes} />
+          <NoteList
+            notes={filteredNotes}
+            deleteNote={deleteNote}
+          />
         </>
       )}
 
       {page === "write" && (
-        <NoteForm addNote={addNote} />
+        <NoteForm
+          addNote={addNote}
+          goHome={() => setPage("home")}
+        />
       )}
 
       {page === "stats" && (
