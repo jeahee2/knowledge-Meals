@@ -13,13 +13,6 @@ function App() {
 
   const sampleNotes = [
     {
-      id: 1,
-      subject: "수학",
-      title: "삼각함수",
-      content: "sin, cos, tan 공식 정리",
-      tag: "수학",
-    },
-    {
       id: 2,
       subject: "영어",
       title: "관계대명사",
@@ -39,13 +32,6 @@ function App() {
       title: "현대소설",
       content: "시점과 서술 방식 정리",
       tag: "문학",
-    },
-    {
-      id: 5,
-      subject: "프로그래밍",
-      title: "React useState",
-      content: "상태를 관리하는 Hook",
-      tag: "React",
     },
   ];
 
